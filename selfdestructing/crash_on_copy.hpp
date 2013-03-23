@@ -54,8 +54,18 @@ namespace crashes {
 			}
 		};
 
+		////////////////////////////////////////
+		struct should_decrement_on_destruction {
+			static const bool should_decrement=true;
+		};
+
+		//////////////////////////////////////////
+		struct shouldnt_decrement_on_destruction {
+			static const bool should_decrement=false;
+		};
+
 		/////////////////////
-		template <typename T>
+		template <typename T,typename TDecrement>
 		class total_count
 		{
 			static size_t count_nr;
@@ -79,14 +89,15 @@ namespace crashes {
 				return count_nr>=N;
 			}
 
-		//protected:
+			//protected:
 
 			~total_count()
 			{
-				--count_nr;
+				if (TDecrement::should_decrement)
+					--count_nr;
 			}
 		};
-		template <typename T> size_t total_count<T>::count_nr(0);
+		template <typename T,typename TDecrement> size_t total_count<T,TDecrement>::count_nr(0);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		template <size_t MaxN,typename TFeedback=on_feedback, typename TCounter=simple_count>
@@ -149,7 +160,7 @@ namespace crashes {
 
 	/// crashes on MaxN total instances of T
 	template <size_t MaxN,typename T>
-	struct on_total : public detail::when<MaxN,on_feedback,detail::total_count<T>>
+	struct on_total : public detail::when<MaxN,on_feedback,detail::total_count<T,detail::should_decrement_on_destruction>>
 	{
 		typedef copies instances;
 		typedef copies instance;
