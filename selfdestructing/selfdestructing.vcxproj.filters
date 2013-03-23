@@ -24,7 +24,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="selfdestructs_itself.hpp">
+    <ClInclude Include="crash_on_copy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
