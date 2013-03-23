@@ -6,25 +6,50 @@
 namespace crashes {
 
 	typedef std::function<void (int)> on_feedback;
-	typedef std::shared_ptr<int> shared_int;
 
-	template <int MaxN,typename TFeedback=on_feedback, typename TSharedInt=shared_int>
+	namespace detail {
+
+		////////////////////////////////////////
+		typedef std::shared_ptr<size_t> shared_number;
+		
+		/////////////////////////////////////////
+		template <typename TSharedInt=shared_number>
+		class shared_count {
+			TSharedInt copy_nr;
+		
+		public:
+
+			shared_count():copy_nr(new size_t(0)){}
+
+			size_t get_copy_nr() const {
+				return *copy_nr;
+			}
+
+			void increment() {
+				++(*copy_nr);
+			}
+		};
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	template <int MaxN,typename TFeedback=on_feedback, typename TCounter=detail::shared_count<detail::shared_number>>
 	struct on {
 		class copies {
-			TSharedInt copy_nr;
+			TCounter counter;
 			TFeedback feedback;
 		public:
 			
-			copies():copy_nr(new int(0)) { }
+			copies() { }
 
 			copies(const copies& other):
-				copy_nr(other.copy_nr),
+				counter(other.counter),
 				feedback(other.feedback)
 			{
-				++(*copy_nr);
+				counter.increment();
+				size_t count=counter.get_copy_nr();
 				if (feedback)
-					feedback(*copy_nr);
-				if (*copy_nr>=MaxN)
+					feedback(count);
+				if (count>=MaxN)
 					throw std::runtime_error("illegal number of copies");
 			}
 
@@ -35,7 +60,7 @@ namespace crashes {
 			}
 
 			void swap(copies const& other) {
-				std::swap(copy_nr,other.copy_nr);
+				std::swap(counter,other.counter);
 				std::swap(feedback,other.feedback);
 			}
 
