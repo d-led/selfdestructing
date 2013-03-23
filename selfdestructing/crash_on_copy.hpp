@@ -89,10 +89,12 @@ namespace crashes {
 		};
 	}
 
+	/// crashes on MaxN total number of copies
 	template <size_t MaxN>
 	struct on : public detail::when<MaxN,on_feedback,detail::shared_count<detail::shared_number>>
 	{};
 
+	/// crashes on MaxN'th copy
 	template <size_t MaxN>
 	struct after : public detail::when<MaxN,on_feedback,detail::simple_count>
 	{};
