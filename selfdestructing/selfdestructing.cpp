@@ -11,7 +11,7 @@
 
 struct TestNumberCrash : public crashes::on<2>::copies {};
 struct TestCopyNrCrash : public crashes::after<2>::copies {};
-//struct TestTotalNrCrash : public crashes::total<2,TestTotalNrCrash>::instances {};
+struct TestTotalNrCrash : public crashes::on_total<2,TestTotalNrCrash>::instances {};
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -37,14 +37,20 @@ int _tmain(int argc, _TCHAR* argv[])
 		TestCopyNrCrash C3=C2;
 	},true));
 
-	//tests.push_back(std::make_pair([]{
-	//	TestTotalNrCrash C;
-	//	C.set_feedback([](int num) { std::cout<<num<<std::endl; });
-	//	TestTotalNrCrash C2;
-	//	C2.set_feedback([](int num) { std::cout<<num<<std::endl; });
-	//	TestTotalNrCrash C3;
-	//	C3.set_feedback([](int num) { std::cout<<num<<std::endl; });
-	//},false));
+	tests.push_back(std::make_pair([]{
+		TestTotalNrCrash C;
+		TestTotalNrCrash C2;
+	},true));
+
+	tests.push_back(std::make_pair([]{
+		{ TestTotalNrCrash C; }
+		TestTotalNrCrash C;
+	},false));
+
+	tests.push_back(std::make_pair([]{
+		TestTotalNrCrash C;
+		TestTotalNrCrash C2=C;
+	},true));
 
 	for (auto test : tests) {
 		bool crashed=false;
