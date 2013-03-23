@@ -44,7 +44,7 @@ struct TestAfterTotalNrCrash : public crashes::after_total<3,TestAfterTotalNrCra
 
 ---
 
-Singular form alias is also available, i.e. `crashes::on<1>::copy`.
+Singular form aliases are also available, i.e. `crashes::on<1>::copy`.
 
 There's no thread-safe policy yet.
 
