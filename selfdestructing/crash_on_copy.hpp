@@ -165,4 +165,12 @@ namespace crashes {
 		typedef copies instances;
 		typedef copies instance;
 	};
+
+	/// crashes on MaxN total instances of T
+	template <size_t MaxN,typename T>
+	struct after_total : public detail::when<MaxN,on_feedback,detail::total_count<T,detail::shouldnt_decrement_on_destruction>>
+	{
+		typedef copies instances;
+		typedef copies instance;
+	};
 }
