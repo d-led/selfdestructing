@@ -14,7 +14,7 @@ struct TestCopyNrCrash : public crashes::after<2>::copies {};
 struct TestTotalNrCrash : public crashes::on_total<2,TestTotalNrCrash>::instances {};
 struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
 	tests.push_back(std::make_pair([]{
