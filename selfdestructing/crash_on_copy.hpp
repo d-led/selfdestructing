@@ -52,19 +52,16 @@ namespace crashes {
 	template <int MaxN,typename TFeedback=on_feedback>
 	struct after {
 		class copies {
-			std::shared_ptr<int> copy_nr;
+			int copy_nr;
 			TFeedback feedback;
 		public:
 			
-			copies():copy_nr(new int(0)) {
-				feedback.ping(*copy_nr);
-			}
+			copies():copy_nr(0) { }
 
 			copies(const copies& other):
-				copy_nr(other.copy_nr),
+				copy_nr(other.copy_nr+1),
 				feedback(other.feedback)
 			{
-				++(*copy_nr);
 				if (feedback)
 					feedback(copy_nr);
 				if (copy_nr>=MaxN)

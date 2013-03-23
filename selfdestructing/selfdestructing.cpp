@@ -5,20 +5,46 @@
 
 #include "crash_on_copy.hpp"
 #include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
 
-struct TestNumberCrash : public crashes::on<2>::copies
-{
-};
+struct TestNumberCrash : public crashes::on<2>::copies {};
+struct TestCopyNrCrash : public crashes::after<2>::copies {};
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	try {
+	std::vector<std::pair<std::function<void()>,bool>> tests;
+	tests.push_back(std::make_pair([]{
 		TestNumberCrash C;
 		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
 		TestNumberCrash C2=C;
 		TestNumberCrash C3=C;
-	} catch (std::exception& e) {
-		std::cout<<e.what()<<std::endl;
+	},true));
+
+	tests.push_back(std::make_pair([]{
+		TestCopyNrCrash C;
+		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
+		TestCopyNrCrash C2=C;
+		TestCopyNrCrash C3=C;
+	},false));
+
+	tests.push_back(std::make_pair([]{
+		TestCopyNrCrash C;
+		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
+		TestCopyNrCrash C2=C;
+		TestCopyNrCrash C3=C2;
+	},true));
+
+	for (auto test : tests) {
+		bool crashed=false;
+		try {
+			test.first();
+		} catch (std::exception& e) {
+			crashed=true;
+			std::cout<<e.what()<<std::endl;
+		}
+		assert(crashed==test.second);
 	}
 
 	return 0;
