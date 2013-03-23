@@ -36,7 +36,10 @@ struct TestTotalNrCrash : public crashes::on_total<3,TestTotalNrCrash>::instance
 - crashes on 2 total live instances of the class
 - doesn't crash on any creation if the total amount of instances is below 3
 
-
+````cpp
+struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
+````
+- crashes after any 2 instantiations of the class
 
 License
 =======
