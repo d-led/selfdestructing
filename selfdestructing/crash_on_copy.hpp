@@ -12,6 +12,7 @@ namespace crashes {
 		//////////////////////////////////////////////
 		typedef std::shared_ptr<size_t> shared_number;
 
+		////////////////////
 		class simple_count {
 			size_t copy_nr;
 		public:
@@ -45,8 +46,35 @@ namespace crashes {
 			}
 		};
 
+		/////////////////////
+		template <typename T>
+		class total_count
+		{
+			static size_t count_nr;
+		public:
+			total_count()
+			{
+				increment();
+			}
+
+			size_t get_copy_nr() const {
+				return copy_nr;
+			}
+
+			void increment() {
+				++copy_nr;
+			}
+
+		protected:
+			~total_count()
+			{
+				--count_nr;
+			}
+		};
+		template <typename T> size_t total_count<T>::count_nr(0);
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		template <size_t MaxN,typename TFeedback=on_feedback, typename TCounter=shared_count<shared_number>>
+		template <size_t MaxN,typename TFeedback=on_feedback, typename TCounter=simple_count>
 		struct when {
 			class copies {
 				TCounter counter;
@@ -54,6 +82,8 @@ namespace crashes {
 			public:
 
 				copies() { }
+
+				virtual ~copies() {} //todo: review
 
 				copies(const copies& other):
 					counter(other.counter),
@@ -98,4 +128,16 @@ namespace crashes {
 	template <size_t MaxN>
 	struct after : public detail::when<MaxN,on_feedback,detail::simple_count>
 	{};
+
+	///// crashes on MaxN total instances of T
+	//template <size_t MaxN,typename T>
+	//struct total {
+	//	typedef detail::when<MaxN,on_feedback,detail::total_count<T>> impl;
+	//	struct instances : public impl
+	//	{
+	//		void set_feedback(on_feedback const& f) {
+	//			static_cast<impl>(*this).set_feedback(f);
+	//		}
+	//	};
+	//};
 }
