@@ -162,7 +162,7 @@ namespace crashes {
 	template <size_t MaxN,typename T>
 	struct on_total : public detail::when<MaxN,on_feedback,detail::total_count<T,detail::should_decrement_on_destruction>>
 	{
-		// instead typedef  copies instance - for gcc/standard complience
+		// instead typedef  copies instance - for gcc/standard compliance
 		typedef typename crashes::detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::should_decrement_on_destruction> >::copies instances;
 		typedef typename crashes::detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::should_decrement_on_destruction> >::copies instance;
 	};
