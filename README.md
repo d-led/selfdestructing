@@ -3,9 +3,7 @@ selfdestructing-cpp
 
 This is a small C++ "artwork" - classes that deliberately crash on object construction.
 
-The goal is to create a DSL that is readable in English.
-
-The project is meant to be a work in progress, since there are lots of possibilites of use and configuration of such classes.
+The goal is to create a policy DSL that is readable in English. The project is a work in progress, since there are lots of possibilites of use and configuration of such classes, considering the richness of the recent C++ standard.
 
 Use?
 ----
