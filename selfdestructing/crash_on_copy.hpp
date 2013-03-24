@@ -163,15 +163,15 @@ namespace crashes {
 	struct on_total : public detail::when<MaxN,on_feedback,detail::total_count<T,detail::should_decrement_on_destruction>>
 	{
 		// instead typedef  copies instance - for gcc/standard complience
-		typedef typename detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::should_decrement_on_destruction> >::copies instances;
-		typedef typename detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::should_decrement_on_destruction> >::copies instance;
+		typedef typename detail::when<MaxN, on_feedback, detail::total_count<T, detail::should_decrement_on_destruction> >::copies instances;
+		typedef typename detail::when<MaxN, on_feedback, detail::total_count<T, detail::should_decrement_on_destruction> >::copies instance;
 	};
 
 	/// crashes on MaxN total instances of T
 	template <size_t MaxN,typename T>
 	struct after_total : public detail::when<MaxN,on_feedback,detail::total_count<T,detail::shouldnt_decrement_on_destruction>>
 	{
-		typedef typename detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::shouldnt_decrement_on_destruction> >::copies instances;
-		typedef typename detail::when<MaxN, std::function<void(int)>, crashes::detail::total_count<T, crashes::detail::shouldnt_decrement_on_destruction> >::copies instance;
+		typedef typename detail::when<MaxN, on_feedback, detail::total_count<T, detail::shouldnt_decrement_on_destruction> >::copies instances;
+		typedef typename detail::when<MaxN, on_feedback, detail::total_count<T, detail::shouldnt_decrement_on_destruction> >::copies instance;
 	};
 }
