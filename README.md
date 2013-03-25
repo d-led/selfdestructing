@@ -13,10 +13,11 @@ A the primary use is (self-)education. Other uses may include debugging legacy c
 Test: see selfdestructing.cpp
 
 ````cpp
-struct TestNumberCrash : public crashes::on<2>::copies {};
+struct TestNumberCrash : public crashes::on<3>::copies {};
 ````
-- crashes on 2 total copies of the originally created object
-- doesn't crash on 2 total instances of the class
+![on 3 copies](/doc/img/on_copies.png)
+- crashes on 3 total copies of the originally created object
+- doesn't crash on 3 total instances of the class
 
 ---
 
