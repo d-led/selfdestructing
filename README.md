@@ -23,16 +23,18 @@ struct TestNumberCrash : public crashes::on<3>::copies {};
 
 
 ````cpp
-struct TestCopyNrCrash : public crashes::after<2>::copies {};
+struct TestCopyNrCrash : public crashes::after<3>::copies {};
 ````
-- crashes on any second copy of the original object
-- doesn't crash on 2 total instances of the class 
+![after 3 copies](/doc/img/after_copies.png)
+- crashes on any 3rd copy of the original object
+- doesn't crash on 3 total instances of the class 
 
 ---
 
 ````cpp
 struct TestTotalNrCrash : public crashes::on_total<3,TestTotalNrCrash>::instances {};
 ````
+![on total 3 instances](/doc/img/on_total_instances.png)
 - crashes on instantiation of an object if 2 objects are alive
 - doesn't crash on any creation if the total amount of instances is below 2
 
@@ -41,6 +43,7 @@ struct TestTotalNrCrash : public crashes::on_total<3,TestTotalNrCrash>::instance
 ````cpp
 struct TestAfterTotalNrCrash : public crashes::after_total<3,TestAfterTotalNrCrash>::instances {};
 ````
+![after total 3 instances](/doc/img/after_total_instances.png)
 - crashes after a third object instantiation of the class
 
 ---
