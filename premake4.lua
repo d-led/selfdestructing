@@ -7,7 +7,8 @@ actions.make_solution "selfdestructing"
 includedirs { "./selfdestructing" }
 ----------------------------------------------------------------------------------------------------------------
 actions.make_console_app(
-	"selfdestructing",
-	files { "./test/test.cpp" }
-	actions.make_cpp11()
-	actions.run_target_after_build()
+	"selfdestructing-test",
+	{ "./test/test.cpp" }
+)
+actions.make_cpp11()
+actions.run_target_after_build()

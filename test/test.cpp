@@ -1,9 +1,6 @@
 // selfdestructing.cpp : Defines the entry point for the console application.
 //
-
-#include "stdafx.h"
-
-#include "crash_on_copy.hpp"
+#include <selfdestructing.hpp>
 #include <iostream>
 #include <vector>
 #include <functional>
