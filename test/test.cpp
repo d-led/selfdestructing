@@ -6,6 +6,8 @@
 #include <functional>
 #include <cassert>
 
+#define ASSERT( expression ) std::cout<<( (expression) ? "OK" : "NOT OK" )<<std::endl;
+
 int main(int argc, char* argv[])
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
@@ -127,7 +129,7 @@ int main(int argc, char* argv[])
 			crashed=true;
 			std::cout<<e.what()<<std::endl;
 		}
-		assert(crashed==test.second);
+		ASSERT(crashed==test.second);
 	}
 
 	return 0;
