@@ -82,48 +82,33 @@ TEST_CASE("crashes after copies by aggregation") {
 	CHECK_THROWS( TestCopyNrCrashMember C3=C2 );
 }
 
-
-void test()
-{
-	std::vector<std::pair<std::function<void()>,bool>> tests;
-
+namespace {
 	struct TestTotalNrCrashMember { crashes::on_total<2,TestTotalNrCrashMember>::instances _; };
-	tests.push_back(std::make_pair([]{
-		TestTotalNrCrashMember C;
-		TestTotalNrCrashMember C2;
-	},true));
-
-	tests.push_back(std::make_pair([]{
-		{ TestTotalNrCrashMember C; }
-		TestTotalNrCrashMember C;
-	},false));
-
-	tests.push_back(std::make_pair([]{
-		TestTotalNrCrashMember C;
-		TestTotalNrCrashMember C2=C;
-	},true));
-
-
-	struct TestAfterTotalNrCrashMember { crashes::after_total<2,TestAfterTotalNrCrashMember>::instances _; };
-	tests.push_back(std::make_pair([]{
-		{ TestAfterTotalNrCrashMember C; }
-		TestAfterTotalNrCrashMember C;
-	},true));
-
-	tests.push_back(std::make_pair([]{
-		TestAfterTotalNrCrashMember C;
-		TestAfterTotalNrCrashMember C2=C;
-	},true));
-
-	for (auto test : tests) {
-		bool crashed=false;
-		try {
-			test.first();
-		} catch (std::exception& e) {
-			crashed=true;
-			std::cout<<e.what()<<std::endl;
-		}
-		ASSERT(crashed==test.second);
-	}
 }
 
+TEST_CASE("crashes on total by aggregation") {
+	TestTotalNrCrashMember C;
+	CHECK_THROWS( TestTotalNrCrashMember C2 );
+}
+
+TEST_CASE("doesn't crash on total by aggregation") {
+	{ TestTotalNrCrashMember C; }
+	TestTotalNrCrashMember C;
+}
+
+TEST_CASE("crashes on total by aggregation when copied") {
+	TestTotalNrCrashMember C;
+	CHECK_THROWS( TestTotalNrCrashMember C2=C );
+}
+
+TEST_CASE("crashes after total by aggregation") {
+	struct TestAfterTotalNrCrashMember { crashes::after_total<2,TestAfterTotalNrCrashMember>::instances _; };
+	{ TestAfterTotalNrCrashMember C; }
+	CHECK_THROWS( TestAfterTotalNrCrashMember C );
+}
+
+TEST_CASE("crashes after total by aggregation when copied") {
+	struct TestAfterTotalNrCrashMember { crashes::after_total<2,TestAfterTotalNrCrashMember>::instances _; };
+	TestAfterTotalNrCrashMember C;
+	CHECK_THROWS( TestAfterTotalNrCrashMember C2=C );
+}
