@@ -34,7 +34,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG -D_DEBUG
   INCLUDES  += -I.. -I../selfdestructing -I../Catch/single_include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -v -fPIC -std=c++11
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -v -fPIC -std=c++0x
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L..
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
@@ -58,7 +58,7 @@ ifeq ($(config),release)
   DEFINES   += -DRELEASE
   INCLUDES  += -I.. -I../selfdestructing -I../Catch/single_include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -v -fPIC -std=c++11
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -v -fPIC -std=c++0x
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L.. -s
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
