@@ -47,21 +47,21 @@ TEST_CASE("crashes on_total instances when copied") {
 	CHECK_THROWS( TestTotalNrCrash C2=C );
 }
 
+TEST_CASE("crashes after total instances") {
+	struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
+	{ TestAfterTotalNrCrash C; }
+	CHECK_THROWS( TestAfterTotalNrCrash C );
+}
+
+TEST_CASE("crashes after total instances when copied") {
+	struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
+	TestAfterTotalNrCrash C;
+	CHECK_THROWS( TestAfterTotalNrCrash C2=C );
+}
+
 void test()
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
-
-	struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
-	tests.push_back(std::make_pair([]{
-		{ TestAfterTotalNrCrash C; }
-		TestAfterTotalNrCrash C;
-	},true));
-
-	tests.push_back(std::make_pair([]{
-		TestAfterTotalNrCrash C;
-		TestAfterTotalNrCrash C2=C;
-	},true));
-
 
 	// testing use by aggregation
 	struct TestNumberCrashMember { crashes::on<2>::copies _; };
