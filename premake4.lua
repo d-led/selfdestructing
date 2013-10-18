@@ -1,3 +1,4 @@
+_G.package.path=_G.package.path..[[;./?.lua;./?/?.lua]]
 assert ( require 'premake.quickstart' )
 
 make_solution 'selfdestructing'
