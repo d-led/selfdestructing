@@ -5,7 +5,11 @@
 
 namespace crashes {
 
+#ifndef SELFDESTRUCTING_FUNCTION_IN_TR1
 	typedef std::function<void (int)> on_feedback;
+#else
+		typedef std::tr1::function<void (int)> on_feedback;	
+#endif
 
 	namespace detail {
 
