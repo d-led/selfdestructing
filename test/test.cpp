@@ -28,26 +28,28 @@ TEST_CASE("crashes after 2 copies") {
 	CHECK_THROWS( TestCopyNrCrash C4=C2 );
 }
 
+namespace {
+		struct TestTotalNrCrash : public crashes::on_total<2,TestTotalNrCrash>::instances {};
+}
+
+TEST_CASE("crashes on_total instances") {
+	TestTotalNrCrash C;
+	CHECK_THROWS( TestTotalNrCrash C2 );
+}
+
+TEST_CASE("doesn't crashe on_total instances when destroyed") {
+	{ TestTotalNrCrash C; }
+	CHECK_NOTHROW( TestTotalNrCrash C );
+}
+
+TEST_CASE("crashes on_total instances when copied") {
+	TestTotalNrCrash C;
+	CHECK_THROWS( TestTotalNrCrash C2=C );
+}
+
 void test()
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
-
-	struct TestTotalNrCrash : public crashes::on_total<2,TestTotalNrCrash>::instances {};
-	tests.push_back(std::make_pair([]{
-		TestTotalNrCrash C;
-		TestTotalNrCrash C2;
-	},true));
-
-	tests.push_back(std::make_pair([]{
-		{ TestTotalNrCrash C; }
-		TestTotalNrCrash C;
-	},false));
-
-	tests.push_back(std::make_pair([]{
-		TestTotalNrCrash C;
-		TestTotalNrCrash C2=C;
-	},true));
-
 
 	struct TestAfterTotalNrCrash : public crashes::after_total<2,TestAfterTotalNrCrash>::instances {};
 	tests.push_back(std::make_pair([]{
