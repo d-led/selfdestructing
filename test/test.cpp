@@ -59,35 +59,33 @@ TEST_CASE("crashes after total instances when copied") {
 	CHECK_THROWS( TestAfterTotalNrCrash C2=C );
 }
 
+TEST_CASE("crashes on copies by aggregation") {
+	struct TestNumberCrashMember { crashes::on<2>::copies _; };
+	TestNumberCrashMember C;
+	TestNumberCrashMember C2=C;
+	CHECK_THROWS( TestNumberCrashMember C3=C );
+}
+
+namespace {
+	struct TestCopyNrCrashMember { crashes::after<2>::copies _; };
+}
+
+TEST_CASE("doesn't crash after copies by aggregation") {
+	TestCopyNrCrashMember C;
+	TestCopyNrCrashMember C2=C;
+	CHECK_NOTHROW( TestCopyNrCrashMember C3=C );
+}
+
+TEST_CASE("crashes after copies by aggregation") {
+	TestCopyNrCrashMember C;
+	TestCopyNrCrashMember C2=C;
+	CHECK_THROWS( TestCopyNrCrashMember C3=C2 );
+}
+
+
 void test()
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
-
-	// testing use by aggregation
-	struct TestNumberCrashMember { crashes::on<2>::copies _; };
-	tests.push_back(std::make_pair([]{
-		TestNumberCrashMember C;
-		C._.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestNumberCrashMember C2=C;
-		TestNumberCrashMember C3=C;
-	},true));
-
-
-	struct TestCopyNrCrashMember { crashes::after<2>::copies _; };
-	tests.push_back(std::make_pair([]{
-		TestCopyNrCrashMember C;
-		C._.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestCopyNrCrashMember C2=C;
-		TestCopyNrCrashMember C3=C;
-	},false));
-
-	tests.push_back(std::make_pair([]{
-		TestCopyNrCrashMember C;
-		C._.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestCopyNrCrashMember C2=C;
-		TestCopyNrCrashMember C3=C2;
-	},true));
-
 
 	struct TestTotalNrCrashMember { crashes::on_total<2,TestTotalNrCrashMember>::instances _; };
 	tests.push_back(std::make_pair([]{
