@@ -4,7 +4,10 @@ actions = assert( require 'premake.actions' )
 
 ----------------------------------------------------------------------------------------------------------------
 actions.make_solution "selfdestructing"
-includedirs { "./selfdestructing" }
+includedirs { 
+	"./selfdestructing",
+	"./Catch/single_include"
+}
 ----------------------------------------------------------------------------------------------------------------
 actions.make_console_app(
 	"selfdestructing-test",

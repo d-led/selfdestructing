@@ -32,7 +32,7 @@ ifeq ($(config),debug)
   TARGETDIR  = ../macosx/bin/Debug
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   += -DDEBUG -D_DEBUG -DGTEST_USE_OWN_TR1_TUPLE=1
-  INCLUDES  += -I.. -I../selfdestructing
+  INCLUDES  += -I.. -I../selfdestructing -I../Catch/single_include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -v  -fPIC -std=c++11 -stdlib=libc++ -std=c++11
   CXXFLAGS  += $(CFLAGS) 
@@ -56,7 +56,7 @@ ifeq ($(config),release)
   TARGETDIR  = ../macosx/bin/Release
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   += -DRELEASE -DGTEST_USE_OWN_TR1_TUPLE=1
-  INCLUDES  += -I.. -I../selfdestructing
+  INCLUDES  += -I.. -I../selfdestructing -I../Catch/single_include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -v  -fPIC -std=c++11 -stdlib=libc++ -std=c++11
   CXXFLAGS  += $(CFLAGS) 

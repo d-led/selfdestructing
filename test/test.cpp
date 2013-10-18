@@ -1,5 +1,5 @@
-// selfdestructing.cpp : Defines the entry point for the console application.
-//
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 #include <selfdestructing.hpp>
 #include <iostream>
 #include <vector>
@@ -8,35 +8,29 @@
 
 #define ASSERT( expression ) std::cout<<( (expression) ? "OK" : "NOT OK" )<<std::endl;
 
-int main(int argc, char* argv[])
+void test();
+
+TEST_CASE("crashes on 2 copies, used via inheritance") {
+	struct TestNumberCrash : public crashes::on<2>::copies {};
+	TestNumberCrash C;
+	CHECK_NOTHROW( TestNumberCrash C2=C );
+	CHECK_THROWS( TestNumberCrash C3=C );
+}
+
+TEST_CASE("crashes after 2 copies") {
+	struct TestCopyNrCrash : public crashes::after<2>::copies { TestCopyNrCrash() {} };
+	TestCopyNrCrash C;
+	TestCopyNrCrash C2=C;
+	CHECK_NOTHROW( TestCopyNrCrash C3=C );
+
+	////
+
+	CHECK_THROWS( TestCopyNrCrash C4=C2 );
+}
+
+void test()
 {
 	std::vector<std::pair<std::function<void()>,bool>> tests;
-
-	// testing use by inheritance
-	struct TestNumberCrash : public crashes::on<2>::copies {};
-	tests.push_back(std::make_pair([]{
-		TestNumberCrash C;
-		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestNumberCrash C2=C;
-		TestNumberCrash C3=C;
-	},true));
-
-
-	struct TestCopyNrCrash : public crashes::after<2>::copies {};
-	tests.push_back(std::make_pair([]{
-		TestCopyNrCrash C;
-		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestCopyNrCrash C2=C;
-		TestCopyNrCrash C3=C;
-	},false));
-
-	tests.push_back(std::make_pair([]{
-		TestCopyNrCrash C;
-		C.set_feedback([](int num) { std::cout<<num<<std::endl; });
-		TestCopyNrCrash C2=C;
-		TestCopyNrCrash C3=C2;
-	},true));
-
 
 	struct TestTotalNrCrash : public crashes::on_total<2,TestTotalNrCrash>::instances {};
 	tests.push_back(std::make_pair([]{
@@ -131,7 +125,5 @@ int main(int argc, char* argv[])
 		}
 		ASSERT(crashed==test.second);
 	}
-
-	return 0;
 }
 
