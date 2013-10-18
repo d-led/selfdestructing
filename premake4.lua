@@ -1,17 +1,12 @@
--- A solution contains projects, and defines the available configurations
-cfg = assert( require 'premake.config' )
-actions = assert( require 'premake.actions' )
+assert ( require 'premake.quickstart' )
 
-----------------------------------------------------------------------------------------------------------------
-actions.make_solution "selfdestructing"
+make_solution 'selfdestructing'
+
 includedirs { 
-	"./selfdestructing",
-	"./Catch/single_include"
+	'./selfdestructing',
+	'./Catch/single_include'
 }
-----------------------------------------------------------------------------------------------------------------
-actions.make_console_app(
-	"selfdestructing-test",
-	{ "./test/test.cpp" }
-)
-actions.make_cpp11()
-actions.run_target_after_build()
+
+make_console_app( 'selfdestructing-test', { './test/test.cpp' } )
+make_cpp11()
+run_target_after_build()
