@@ -1,5 +1,4 @@
-_G.package.path=_G.package.path..[[;./?.lua;./?/?.lua]]
-assert ( require 'premake.quickstart' )
+include 'premake'
 
 make_solution 'selfdestructing'
 
@@ -9,5 +8,7 @@ includedirs {
 }
 
 make_console_app( 'selfdestructing-test', { './test/test.cpp' } )
-make_cpp11()
+
+use_standard('c++11')
+
 run_target_after_build()
