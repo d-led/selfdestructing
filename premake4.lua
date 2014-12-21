@@ -9,6 +9,6 @@ includedirs {
 
 make_console_app( 'selfdestructing-test', { './test/test.cpp' } )
 
-use_standard('c++11')
+use_standard('c++0x')
 
 run_target_after_build()
