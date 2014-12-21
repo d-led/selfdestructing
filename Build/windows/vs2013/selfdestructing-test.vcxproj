@@ -67,28 +67,28 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\</OutDir>
+    <OutDir>..\..\..\bin\windows\vs2013\</OutDir>
     <IntDir>obj\x32\Debug\</IntDir>
     <TargetName>selfdestructing-test</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\</OutDir>
+    <OutDir>..\..\..\bin\windows\vs2013\</OutDir>
     <IntDir>obj\x64\Debug\</IntDir>
     <TargetName>selfdestructing-test</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\</OutDir>
+    <OutDir>..\..\..\bin\windows\vs2013\</OutDir>
     <IntDir>obj\x32\Release\</IntDir>
     <TargetName>selfdestructing-test</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\</OutDir>
+    <OutDir>..\..\..\bin\windows\vs2013\</OutDir>
     <IntDir>obj\x64\Release\</IntDir>
     <TargetName>selfdestructing-test</TargetName>
     <TargetExt>.exe</TargetExt>
