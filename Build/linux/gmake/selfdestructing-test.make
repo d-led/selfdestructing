@@ -21,7 +21,7 @@ endif
 
 ifeq ($(config),debug32)
   OBJDIR     = obj/x32/Debug
-  TARGETDIR  = ../../..
+  TARGETDIR  = ../../../bin/linux/gmake
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   +=
   INCLUDES  += -I../../../selfdestructing -I../../../Catch/single_include
@@ -45,7 +45,7 @@ endif
 
 ifeq ($(config),release32)
   OBJDIR     = obj/x32/Release
-  TARGETDIR  = ../../..
+  TARGETDIR  = ../../../bin/linux/gmake
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   +=
   INCLUDES  += -I../../../selfdestructing -I../../../Catch/single_include
@@ -69,7 +69,7 @@ endif
 
 ifeq ($(config),debug64)
   OBJDIR     = obj/x64/Debug
-  TARGETDIR  = ../../..
+  TARGETDIR  = ../../../bin/linux/gmake
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   +=
   INCLUDES  += -I../../../selfdestructing -I../../../Catch/single_include
@@ -93,7 +93,7 @@ endif
 
 ifeq ($(config),release64)
   OBJDIR     = obj/x64/Release
-  TARGETDIR  = ../../..
+  TARGETDIR  = ../../../bin/linux/gmake
   TARGET     = $(TARGETDIR)/selfdestructing-test
   DEFINES   +=
   INCLUDES  += -I../../../selfdestructing -I../../../Catch/single_include
