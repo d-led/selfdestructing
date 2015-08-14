@@ -1,4 +1,6 @@
 language: cpp
 
+sudo: false
+
 script:
   - make -C Build/linux/gmake config=release64
