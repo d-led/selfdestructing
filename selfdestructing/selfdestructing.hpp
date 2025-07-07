@@ -2,33 +2,33 @@
 #include <memory>
 #include <functional>
 #include <algorithm>
+#include <atomic>
+#include <mutex>
 
 namespace crashes {
 
-#ifndef SELFDESTRUCTING_FUNCTION_IN_TR1
-	typedef std::function<void (int)> on_feedback;
-#else
-		typedef std::tr1::function<void (int)> on_feedback;	
-#endif
+typedef std::function<void (int)> on_feedback;
 
 	namespace detail {
 
 		//////////////////////////////////////////////
-		typedef std::shared_ptr<size_t> shared_number;
+		typedef std::shared_ptr<std::atomic<size_t>> shared_number;
 
 		////////////////////
 		class simple_count {
-			size_t copy_nr;
+			std::atomic<size_t> copy_nr;
 		public:
 
 			simple_count():copy_nr(0){}
+			
+			simple_count(const simple_count& other):copy_nr(other.copy_nr.load()){}
 
 			size_t get_copy_nr() const {
-				return copy_nr;
+				return copy_nr.load();
 			}
 
 			void increment() {
-				++copy_nr;
+				copy_nr.fetch_add(1);
 			}
 
 			bool should_have_crashed_on(size_t) {
@@ -43,14 +43,14 @@ namespace crashes {
 
 		public:
 
-			shared_count():copy_nr(new size_t(0)){}
+			shared_count():copy_nr(std::make_shared<std::atomic<size_t>>(0)){}
 
 			size_t get_copy_nr() const {
-				return *copy_nr;
+				return copy_nr->load();
 			}
 
 			void increment() {
-				++(*copy_nr);
+				copy_nr->fetch_add(1);
 			}
 
 			bool should_have_crashed_on(size_t) {
@@ -72,7 +72,7 @@ namespace crashes {
 		template <typename T,typename TDecrement>
 		class total_count
 		{
-			static size_t count_nr;
+			static std::atomic<size_t> count_nr;
 
 		public:
 
@@ -82,15 +82,15 @@ namespace crashes {
 			}
 
 			size_t get_copy_nr() const {
-				return count_nr;
+				return count_nr.load();
 			}
 
 			void increment() {
-				++count_nr;
+				count_nr.fetch_add(1);
 			}
 
 			bool should_have_crashed_on(size_t N) {
-				return count_nr>=N;
+				return count_nr.load()>=N;
 			}
 
 			//protected:
@@ -98,10 +98,10 @@ namespace crashes {
 			~total_count()
 			{
 				if (TDecrement::should_decrement)
-					--count_nr;
+					count_nr.fetch_sub(1);
 			}
 		};
-		template <typename T,typename TDecrement> size_t total_count<T,TDecrement>::count_nr(0);
+		template <typename T,typename TDecrement> std::atomic<size_t> total_count<T,TDecrement>::count_nr(0);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		template <size_t MaxN,typename TFeedback=on_feedback, typename TCounter=simple_count>
@@ -109,6 +109,7 @@ namespace crashes {
 			class copies {
 				TCounter counter;
 				TFeedback feedback;
+				mutable std::mutex mutex_;
 			public:
 
 				copies() {
@@ -122,6 +123,7 @@ namespace crashes {
 					counter(other.counter),
 					feedback(other.feedback)
 				{
+					std::lock_guard<std::mutex> lock(mutex_);
 					counter.increment();
 					size_t count=counter.get_copy_nr();
 					if (feedback)
@@ -131,19 +133,30 @@ namespace crashes {
 				}
 
 				copies& operator=(copies const& other)  {
-					copies tmp(other);
-					swap(other);
+					if (this != &other) {
+						std::lock(mutex_, other.mutex_);
+						std::lock_guard<std::mutex> lock1(mutex_, std::adopt_lock);
+						std::lock_guard<std::mutex> lock2(other.mutex_, std::adopt_lock);
+						counter = other.counter;
+						feedback = other.feedback;
+					}
 					return *this;
 				}
 
 				void swap(copies const& other) {
-					std::swap(counter,other.counter);
-					std::swap(feedback,other.feedback);
+					if (this != &other) {
+						std::lock(mutex_, other.mutex_);
+						std::lock_guard<std::mutex> lock1(mutex_, std::adopt_lock);
+						std::lock_guard<std::mutex> lock2(other.mutex_, std::adopt_lock);
+						std::swap(counter,other.counter);
+						std::swap(feedback,other.feedback);
+					}
 				}
 
 			public:
 
 				void set_feedback(TFeedback const& f) {
+					std::lock_guard<std::mutex> lock(mutex_);
 					feedback=f;
 				}
 
