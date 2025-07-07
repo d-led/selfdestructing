@@ -50,10 +50,8 @@ struct TestAfterTotalNrCrash : public crashes::after_total<3,TestAfterTotalNrCra
 
 Singular form aliases are also available, i.e. `crashes::on<1>::copy`.
 
-There's no thread-safe policy yet.
-
 License
 =======
 Author: Dmitry Ledentsov
 
-MIT License (http://www.opensource.org/licenses/mit-license.php)
+[MIT](http://www.opensource.org/licenses/mit-license.php) License
