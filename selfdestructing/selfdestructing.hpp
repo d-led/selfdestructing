@@ -23,12 +23,8 @@ typedef std::function<void (int)> on_feedback;
 			
 			simple_count(const simple_count& other):copy_nr(other.copy_nr.load()){}
 
-			size_t get_copy_nr() const {
-				return copy_nr.load();
-			}
-
-			void increment() {
-				copy_nr.fetch_add(1);
+			size_t increment() {
+				return copy_nr.fetch_add(1) + 1;
 			}
 
 			bool should_have_crashed_on(size_t) {
@@ -45,12 +41,8 @@ typedef std::function<void (int)> on_feedback;
 
 			shared_count():copy_nr(std::make_shared<std::atomic<size_t>>(0)){}
 
-			size_t get_copy_nr() const {
-				return copy_nr->load();
-			}
-
-			void increment() {
-				copy_nr->fetch_add(1);
+			size_t increment() {
+				return copy_nr->fetch_add(1) + 1;
 			}
 
 			bool should_have_crashed_on(size_t) {
@@ -60,12 +52,12 @@ typedef std::function<void (int)> on_feedback;
 
 		////////////////////////////////////////
 		struct should_decrement_on_destruction {
-			static const bool should_decrement=true;
+			static std::atomic<bool> should_decrement;
 		};
 
 		//////////////////////////////////////////
 		struct shouldnt_decrement_on_destruction {
-			static const bool should_decrement=false;
+			static std::atomic<bool> should_decrement;
 		};
 
 		/////////////////////
@@ -81,12 +73,8 @@ typedef std::function<void (int)> on_feedback;
 				increment();
 			}
 
-			size_t get_copy_nr() const {
-				return count_nr.load();
-			}
-
-			void increment() {
-				count_nr.fetch_add(1);
+			size_t increment() {
+				return count_nr.fetch_add(1) + 1;
 			}
 
 			bool should_have_crashed_on(size_t N) {
@@ -102,6 +90,9 @@ typedef std::function<void (int)> on_feedback;
 			}
 		};
 		template <typename T,typename TDecrement> std::atomic<size_t> total_count<T,TDecrement>::count_nr(0);
+        
+        std::atomic<bool> should_decrement_on_destruction::should_decrement(true);
+        std::atomic<bool> shouldnt_decrement_on_destruction::should_decrement(false);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		template <size_t MaxN,typename TFeedback=on_feedback, typename TCounter=simple_count>
@@ -124,8 +115,7 @@ typedef std::function<void (int)> on_feedback;
 					feedback(other.feedback)
 				{
 					std::lock_guard<std::mutex> lock(mutex_);
-					counter.increment();
-					size_t count=counter.get_copy_nr();
+					const size_t count=counter.increment();
 					if (feedback)
 						feedback(count);
 					if (count>=MaxN)
