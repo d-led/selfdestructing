@@ -1,13 +1,16 @@
 -- Minimal premake5.lua for selfdestructing project
 
 workspace "selfdestructing"
-    architecture "x86_64"
+    -- Set default architecture (x64 will be default)
+    defaultplatform "x64"
     
     configurations { "Debug", "Release" }
     platforms { "x64", "x32" }
     
     -- Output directories to match existing structure
-    location "Build/%{os.target()}/%{_ACTION}"
+    -- Support cross-platform generation
+    local target_os = _OPTIONS["os"] or os.target()
+    location("Build/" .. target_os .. "/%{_ACTION}")
     
     filter "platforms:x32"
         architecture "x86"
@@ -30,8 +33,9 @@ project "selfdestructing-test"
     }
     
     -- Output directories to match existing structure
-    targetdir "bin/%{os.target()}/%{_ACTION}/%{cfg.platform}/%{cfg.buildcfg}"
-    objdir "Build/%{os.target()}/%{_ACTION}/obj/%{cfg.platform}/%{cfg.buildcfg}"
+    local target_os = _OPTIONS["os"] or os.target()
+    targetdir("bin/" .. target_os .. "/%{_ACTION}/%{cfg.platform}/%{cfg.buildcfg}")
+    objdir("Build/" .. target_os .. "/%{_ACTION}/obj/%{cfg.platform}/%{cfg.buildcfg}")
     
     filter "configurations:Debug"
         defines { "_DEBUG" }
