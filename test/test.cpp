@@ -117,92 +117,95 @@ TEST_CASE("crashes after total by aggregation when copied") {
 }
 
 TEST_CASE("multithreaded crashes on copies") {
-	struct TestMultiThreadCrash : public crashes::on<3>::copies {};
-	
-	TestMultiThreadCrash original;
-	std::atomic<int> success_count{0};
-	std::atomic<int> exception_count{0};
-	
-	auto copy_task = [&]() {
-		try {
-			TestMultiThreadCrash copy = original;
-			success_count++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		} catch (const std::exception&) {
-			exception_count++;
-		}
-	};
-	
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 5; ++i) {
-		threads.emplace_back(copy_task);
-	}
-	
-	for (auto& t : threads) {
-		t.join();
-	}
-	
-	CHECK(success_count == 2);
-	CHECK(exception_count == 3);
+    struct TestMultiThreadCrash : public crashes::on<3>::copies {};
+    
+    TestMultiThreadCrash original;
+    std::atomic<int> success_count{0};
+    std::atomic<int> exception_count{0};
+    
+    auto copy_task = [&]() {
+        try {
+            TestMultiThreadCrash copy = original;
+            success_count++;
+        } catch (const std::exception&) {
+            exception_count++;
+        }
+    };
+    
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 5; ++i) {
+        threads.emplace_back(copy_task);
+    }
+    
+    for (auto& t : threads) {
+        t.join();
+    }
+    
+    CHECK(success_count == 2);
+    CHECK(exception_count == 3);
 }
 
 TEST_CASE("multithreaded crashes after copies") {
-	struct TestMultiThreadAfterCrash : public crashes::after<2>::copies {};
-	
-	TestMultiThreadAfterCrash original;
-	std::atomic<int> success_count{0};
-	std::atomic<int> exception_count{0};
-	
-	auto copy_task = [&]() {
-		try {
-			TestMultiThreadAfterCrash copy = original;
-			success_count++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		} catch (const std::exception&) {
-			exception_count++;
-		}
-	};
-	
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 4; ++i) {
-		threads.emplace_back(copy_task);
-	}
-	
-	for (auto& t : threads) {
-		t.join();
-	}
-	
-	CHECK(success_count == 4);
-	CHECK(exception_count == 0);
+    struct TestMultiThreadAfterCrash : public crashes::after<2>::copies {};
+    
+    TestMultiThreadAfterCrash original;
+    std::atomic<int> success_count{0};
+    std::atomic<int> exception_count{0};
+    
+    auto copy_task = [&]() {
+        try {
+            TestMultiThreadAfterCrash copy = original;
+            success_count++;
+        } catch (const std::exception&) {
+            exception_count++;
+        }
+    };
+    
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 4; ++i) {
+        threads.emplace_back(copy_task);
+    }
+    
+    for (auto& t : threads) {
+        t.join();
+    }
+    
+    CHECK(success_count == 4);
+    CHECK(exception_count == 0);
 }
 
+// simulate longer-lived tasks
+auto simulate_work = []() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+};
+
 TEST_CASE("multithreaded crashes on total instances") {
-	struct TestMultiThreadTotalCrash : public crashes::on_total<3,TestMultiThreadTotalCrash>::instances {};
-	
-	std::atomic<int> success_count{0};
-	std::atomic<int> exception_count{0};
-	
-	auto create_task = [&]() {
-		try {
-			TestMultiThreadTotalCrash instance;
-			success_count++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		} catch (const std::exception&) {
-			exception_count++;
-		}
-	};
-	
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 6; ++i) {
-		threads.emplace_back(create_task);
-	}
-	
-	for (auto& t : threads) {
-		t.join();
-	}
-	
-	CHECK(success_count == 2);
-	CHECK(exception_count == 4);
+    struct TestMultiThreadTotalCrash : public crashes::on_total<3,TestMultiThreadTotalCrash>::instances {};
+    
+    std::atomic<int> success_count{0};
+    std::atomic<int> exception_count{0};
+    
+    auto create_task = [&]() {
+        try {
+            TestMultiThreadTotalCrash instance;
+            success_count++;
+            simulate_work(); // Keep this one to ensure objects live long enough
+        } catch (const std::exception&) {
+            exception_count++;
+        }
+    };
+    
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 6; ++i) {
+        threads.emplace_back(create_task);
+    }
+    
+    for (auto& t : threads) {
+        t.join();
+    }
+    
+    CHECK(success_count == 2);
+    CHECK(exception_count == 4);
 }
 
 TEST_CASE("multithreaded crashes after total instances") {
@@ -215,7 +218,7 @@ TEST_CASE("multithreaded crashes after total instances") {
         try {
             TestMultiThreadAfterTotalCrash instance;
             success_count++;
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            simulate_work(); // Keep this task till after the assertions
         } catch (const std::exception&) {
             exception_count++;
         }
@@ -236,69 +239,67 @@ TEST_CASE("multithreaded crashes after total instances") {
 }
 
 TEST_CASE("multithreaded aggregation crash test") {
-	struct TestMultiThreadMemberCrash { 
-		crashes::on<3>::copies _; 
-	};
-	
-	TestMultiThreadMemberCrash original;
-	std::atomic<int> success_count{0};
-	std::atomic<int> exception_count{0};
-	
-	auto copy_task = [&]() {
-		try {
-			TestMultiThreadMemberCrash copy = original;
-			success_count++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		} catch (const std::exception&) {
-			exception_count++;
-		}
-	};
-	
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 5; ++i) {
-		threads.emplace_back(copy_task);
-	}
-	
-	for (auto& t : threads) {
-		t.join();
-	}
-	
-	CHECK(success_count == 2);
-	CHECK(exception_count == 3);
+    struct TestMultiThreadMemberCrash { 
+        crashes::on<3>::copies _; 
+    };
+    
+    TestMultiThreadMemberCrash original;
+    std::atomic<int> success_count{0};
+    std::atomic<int> exception_count{0};
+    
+    auto copy_task = [&]() {
+        try {
+            TestMultiThreadMemberCrash copy = original;
+            success_count++;
+        } catch (const std::exception&) {
+            exception_count++;
+        }
+    };
+    
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 5; ++i) {
+        threads.emplace_back(copy_task);
+    }
+    
+    for (auto& t : threads) {
+        t.join();
+    }
+    
+    CHECK(success_count == 2);
+    CHECK(exception_count == 3);
 }
 
 TEST_CASE("multithreaded race condition stress test") {
-	struct StressTestCrash : public crashes::on<10>::copies {};
-	
-	StressTestCrash original;
-	std::atomic<int> success_count{0};
-	std::atomic<int> exception_count{0};
-	
-	auto copy_task = [&]() {
-		for (int i = 0; i < 10; ++i) {
-			try {
-				StressTestCrash copy = original;
-				success_count++;
-				std::this_thread::sleep_for(std::chrono::microseconds(100));
-			} catch (const std::exception&) {
-				exception_count++;
-			}
-		}
-	};
-	
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 20; ++i) {
-		threads.emplace_back(copy_task);
-	}
-	
-	for (auto& t : threads) {
-		t.join();
-	}
-	
-	// Total attempts: 20 threads * 10 attempts = 200
-	// Should have 9 successes and 191 exceptions (since crashes::on<10> allows 9 copies)
-	CHECK(success_count == 9);
-	CHECK(exception_count == 191);
+    struct StressTestCrash : public crashes::on<10>::copies {};
+    
+    StressTestCrash original;
+    std::atomic<int> success_count{0};
+    std::atomic<int> exception_count{0};
+    
+    auto copy_task = [&]() {
+        for (int i = 0; i < 10; ++i) {
+            try {
+                StressTestCrash copy = original;
+                success_count++;
+            } catch (const std::exception&) {
+                exception_count++;
+            }
+        }
+    };
+    
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 20; ++i) {
+        threads.emplace_back(copy_task);
+    }
+    
+    for (auto& t : threads) {
+        t.join();
+    }
+    
+    // Total attempts: 20 threads * 10 attempts = 200
+    // Should have 9 successes and 191 exceptions (since crashes::on<10> allows 9 copies)
+    CHECK(success_count == 9);
+    CHECK(exception_count == 191);
 }
 
 TEST_CASE("multithreaded sequential vs parallel copy behavior") {
@@ -375,7 +376,6 @@ TEST_CASE("multithreaded feedback mechanism test") {
         try {
             FeedbackTest copy = original;
             success_count++;
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         } catch (const std::exception&) {
             exception_count++;
         }
