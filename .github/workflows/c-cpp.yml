@@ -16,4 +16,4 @@ jobs:
       with:
         submodules: recursive
     - name: make
-      run: make -C Build/linux/gmake config=release64
+      run: make -C Build/linux/gmake config=release_x64
